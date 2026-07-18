@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verify OTP & Select Career Choice</title>
+  <link rel="stylesheet" href="verify.css">
+</head>
+<body>
+  <div class="card">
+
+    <!-- OTP Section -->
+    <div id="otpSection">
+      <h2>Verify OTP</h2>
+      <p>An OTP has been sent to your email. Enter it below.</p>
+
+      <div class="otp-field">
+        <label for="otp">OTP</label>
+        <input type="text" id="otp" maxlength="6" autocomplete="one-time-code">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="verifyOTP()">Verify OTP</button>
+        <button class="btn-secondary" onclick="resendOTP()">Resend OTP</button>
+      </div>
+      <p id="otpMsg"></p>
+    </div>
+
+    <!-- Career Choice Section -->
+    <div id="choiceSection" style="display:none;">
+      <h2>Select Career Choice</h2>
+
+      <div class="info-grid">
+        <span class="info-label">Name</span>      <span class="info-value" id="disp_name"></span>
+        <span class="info-label">Department</span><span class="info-value" id="disp_dept"></span>
+        <span class="info-label">Email</span>     <span class="info-value" id="disp_email"></span>
+        <span class="info-label">Mobile</span>    <span class="info-value" id="disp_mobile"></span>
+      </div>
+
+      <div id="currentChoiceBlock" class="current-choice-badge" style="display:none;">
+        Current choice: <strong id="disp_current_choice"></strong>
+      </div>
+
+      <div class="field">
+        <label for="career_choice">Career Choice</label>
+        <select id="career_choice">
+          <option value="">— Select —</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+          <option value="E">E</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="career_choice_confirm">Confirm Choice (type exactly)</label>
+        <input type="text" id="career_choice_confirm">
+        <span class="field-hint">Case and space sensitive.</span>
+      </div>
+
+      <button class="btn-submit" onclick="submitChoice()">Submit</button>
+      <p id="choiceMsg"></p>
+    </div>
+
+    <!-- Done Section -->
+    <div id="doneSection" style="display:none;">
+      <div class="done-icon">✓</div>
+      <h2>Done!</h2>
+      <p id="doneMsg"></p>
+      <div class="card-footer">
+        <a href="index.html">Back to Home</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_FUNC_URL = "https://nzpfljvuxqxijrvcmfao.supabase.co/functions/v1";
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cGZsanZ1eHF4aWpydmNtZmFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTI5MjYsImV4cCI6MjA5OTg2ODkyNn0.MAVZSQNgGleXA-5NUONkiJuMtwHu5Oq8yPuc5s8eKDQ";
+
+    const roll_number = sessionStorage.getItem("roll_number");
+    const email = sessionStorage.getItem("email");
+    const mobile = sessionStorage.getItem("mobile");
+    const student = JSON.parse(sessionStorage.getItem("student") || "{}");
+    const purpose = sessionStorage.getItem("purpose"); // "register" or "edit"
+    const current_choice = sessionStorage.getItem("current_choice"); // set on status page for edit
+
+    // Guard: if no session, go back
+    if (!roll_number || !email) {
+      window.location.href = "index.html";
+    }
+
+    async function verifyOTP() {
+      const otp = document.getElementById("otp").value.trim();
+      const msg = document.getElementById("otpMsg");
+      msg.textContent = "Verifying...";
+      msg.style.color = "black";
+
+      try {
+        const res = await fetch(`${SUPABASE_FUNC_URL}/verify-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
+          body: JSON.stringify({ roll_number, otp, purpose }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          msg.style.color = "red";
+          msg.textContent = data.error || "Invalid OTP.";
+          return;
+        }
+
+        // OTP verified — show career choice section
+        document.getElementById("otpSection").style.display = "none";
+        document.getElementById("choiceSection").style.display = "block";
+
+        // Fill pre-filled info
+        document.getElementById("disp_name").textContent = student.name || "";
+        document.getElementById("disp_dept").textContent = student.department || "";
+        document.getElementById("disp_email").textContent = email;
+        document.getElementById("disp_mobile").textContent = mobile;
+
+        // If edit, show current choice
+        if (purpose === "edit" && current_choice) {
+          document.getElementById("currentChoiceBlock").style.display = "block";
+          document.getElementById("disp_current_choice").textContent = current_choice;
+        }
+
+      } catch (err) {
+        msg.style.color = "red";
+        msg.textContent = "Network error. Try again.";
+      }
+    }
+
+    async function resendOTP() {
+      const msg = document.getElementById("otpMsg");
+      msg.style.color = "black";
+      msg.textContent = "Sending OTP...";
+
+      try {
+        const res = await fetch(`${SUPABASE_FUNC_URL}/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
+          body: JSON.stringify({ roll_number, email, purpose }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          msg.style.color = "red";
+          msg.textContent = data.error || "Failed to send OTP.";
+        } else {
+          msg.style.color = "green";
+          msg.textContent = "OTP sent. Check your email.";
+        }
+      } catch {
+        msg.style.color = "red";
+        msg.textContent = "Network error. Try again.";
+      }
+    }
+
+    async function submitChoice() {
+      const career_choice = document.getElementById("career_choice").value;
+      const career_choice_confirm = document.getElementById("career_choice_confirm").value;
+      const msg = document.getElementById("choiceMsg");
+
+      if (!career_choice) {
+        msg.textContent = "Please select a career choice.";
+        return;
+      }
+
+      if (career_choice !== career_choice_confirm) {
+        msg.textContent = "The typed value does not match the selected choice. It is case and space sensitive.";
+        return;
+      }
+
+      msg.style.color = "black";
+      msg.textContent = "Saving...";
+
+      try {
+        const res = await fetch(`${SUPABASE_FUNC_URL}/save-career-choice`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
+          body: JSON.stringify({ roll_number, email, mobile, career_choice }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          msg.style.color = "red";
+          msg.textContent = data.error || "Failed to save.";
+          return;
+        }
+
+        document.getElementById("choiceSection").style.display = "none";
+        document.getElementById("doneSection").style.display = "block";
+
+        if (data.is_edit) {
+          document.getElementById("doneMsg").textContent =
+            `Your career choice has been updated from "${data.old_choice}" to "${data.new_choice}". ` +
+            `You have ${data.edits_remaining} edit(s) remaining. A confirmation email has been sent.`;
+        } else {
+          document.getElementById("doneMsg").textContent =
+            `Your career choice "${data.new_choice}" has been registered. A confirmation email has been sent.`;
+        }
+
+        // Clear session
+        sessionStorage.clear();
+
+      } catch (err) {
+        msg.style.color = "red";
+        msg.textContent = "Network error. Try again.";
+      }
+    }
+  </script>
+</body>
+</html>

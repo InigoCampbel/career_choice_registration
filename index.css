@@ -1,0 +1,151 @@
+/* ============================================================
+   index.css — Career Choice Registration (Entry Page)
+   Palette: cream / charcoal / clay  |  Georgia + system-ui
+   ============================================================ */
+
+/* ── Reset & Base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --cream:      #F5F0E8;
+  --surface:    #FFFFFF;
+  --charcoal:   #2C2C2C;
+  --clay:       #C07A5A;
+  --clay-dark:  #9E5E3F;
+  --muted:      #6B6560;
+  --border:     #DDD6CA;
+  --error:      #B34040;
+  --success:    #3A7D5A;
+  --radius:     6px;
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-body:  'Calibri', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--charcoal);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border-top: 4px solid var(--clay);
+  box-shadow: 0 2px 12px rgba(44, 44, 44, 0.09);
+  width: 100%;
+  max-width: 460px;
+  padding: 2.25rem 2rem 2rem;
+}
+
+/* ── Page Header ── */
+.page-header {
+  margin-bottom: 1.75rem;
+}
+
+.page-header h1 {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: normal;
+  color: var(--charcoal);
+  line-height: 1.3;
+}
+
+.page-header p.subtitle {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+/* ── Form Fields ── */
+.field {
+  margin-bottom: 1.15rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.field input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--charcoal);
+  background: var(--cream);
+  transition: border-color 0.15s ease;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: var(--clay);
+  background: #fff;
+}
+
+/* ── Button ── */
+.btn-primary {
+  display: inline-block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.7rem 1rem;
+  background: var(--clay);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: var(--clay-dark);
+}
+
+/* ── Status Message ── */
+#msg {
+  margin-top: 0.85rem;
+  font-size: 0.875rem;
+  min-height: 1.25rem;
+  color: var(--error);
+}
+
+#msg.success {
+  color: var(--success);
+}
+
+#msg.info {
+  color: var(--muted);
+}
+
+/* ── Footer hint ── */
+.card-footer {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8125rem;
+  color: var(--muted);
+  text-align: center;
+}

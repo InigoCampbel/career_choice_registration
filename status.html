@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Career Choice</title>
+  <link rel="stylesheet" href="status.css">
+</head>
+<body>
+  <div class="card">
+    <h2>Your Career Choice</h2>
+
+    <div class="info-grid">
+      <span class="info-label">Name</span>      <span class="info-value" id="disp_name"></span>
+      <span class="info-label">Department</span><span class="info-value" id="disp_dept"></span>
+      <span class="info-label">Email</span>     <span class="info-value" id="disp_email"></span>
+      <span class="info-label">Mobile</span>    <span class="info-value" id="disp_mobile"></span>
+    </div>
+
+    <div class="choice-block">
+      <span class="choice-label">Career Choice</span>
+      <span class="choice-value" id="disp_choice"></span>
+    </div>
+
+    <p id="editInfo" class="edit-info"></p>
+
+    <div id="editBlock" style="display:none;">
+      <button class="btn-primary" onclick="startEdit()">Edit Career Choice</button>
+    </div>
+
+    <p id="msg"></p>
+
+    <div class="card-footer">
+      <a href="index.html">Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_FUNC_URL = "https://nzpfljvuxqxijrvcmfao.supabase.co/functions/v1";
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cGZsanZ1eHF4aWpydmNtZmFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTI5MjYsImV4cCI6MjA5OTg2ODkyNn0.MAVZSQNgGleXA-5NUONkiJuMtwHu5Oq8yPuc5s8eKDQ";
+
+    const MAX_EDITS = 3;
+
+    const roll_number = sessionStorage.getItem("roll_number");
+    const email = sessionStorage.getItem("email");
+    const student = JSON.parse(sessionStorage.getItem("student") || "{}");
+    const contact = JSON.parse(sessionStorage.getItem("contact") || "{}");
+    const choice = JSON.parse(sessionStorage.getItem("choice") || "null");
+
+    if (!roll_number || !email || !choice) {
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("disp_name").textContent = student.name || "";
+    document.getElementById("disp_dept").textContent = student.department || "";
+    document.getElementById("disp_email").textContent = contact.email || "";
+    document.getElementById("disp_mobile").textContent = contact.mobile || "";
+    document.getElementById("disp_choice").textContent = choice?.career_choice || "";
+
+    const edits_used = choice ? choice.edit_number - 1 : 0;
+    const edits_remaining = MAX_EDITS - edits_used;
+
+    if (edits_remaining > 0) {
+      document.getElementById("editInfo").textContent =
+        `You have used ${edits_used} of ${MAX_EDITS} edits. You have ${edits_remaining} edit(s) remaining.`;
+      document.getElementById("editBlock").style.display = "block";
+    } else {
+      document.getElementById("editInfo").textContent =
+        `You have used all ${MAX_EDITS} edits. No further changes are allowed.`;
+    }
+
+    async function startEdit() {
+      const msg = document.getElementById("msg");
+      msg.style.color = "black";
+      msg.textContent = "Sending OTP to your email...";
+
+      try {
+        const res = await fetch(`${SUPABASE_FUNC_URL}/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
+          body: JSON.stringify({ roll_number, email, purpose: "edit" }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          msg.style.color = "red";
+          msg.textContent = data.error || "Failed to send OTP.";
+          return;
+        }
+
+        sessionStorage.setItem("purpose", "edit");
+        sessionStorage.setItem("current_choice", choice.career_choice);
+        window.location.href = "verify.html";
+
+      } catch (err) {
+        msg.style.color = "red";
+        msg.textContent = "Network error. Try again.";
+      }
+    }
+  </script>
+</body>
+</html>

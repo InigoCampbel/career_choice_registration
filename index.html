@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Career Choice Registration</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="card">
+    <div class="page-header">
+      <h1>Career Choice Registration</h1>
+      <p class="subtitle">Enter your details to continue.</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="roll_number">Roll Number</label>
+        <input type="text" id="roll_number" required>
+      </div>
+      <div class="field">
+        <label for="email">Email ID</label>
+        <input type="email" id="email" required>
+      </div>
+      <div class="field">
+        <label for="email_confirm">Re-enter Email ID</label>
+        <input type="email" id="email_confirm" required>
+      </div>
+      <div class="field">
+        <label for="mobile">Mobile Number</label>
+        <input type="tel" id="mobile" required>
+      </div>
+      <button type="submit" class="btn-primary">Continue</button>
+    </form>
+
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    const SUPABASE_FUNC_URL = "https://nzpfljvuxqxijrvcmfao.supabase.co/functions/v1";
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cGZsanZ1eHF4aWpydmNtZmFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTI5MjYsImV4cCI6MjA5OTg2ODkyNn0.MAVZSQNgGleXA-5NUONkiJuMtwHu5Oq8yPuc5s8eKDQ";
+
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const msg = document.getElementById("msg");
+      msg.textContent = "";
+
+      const roll_number = document.getElementById("roll_number").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const email_confirm = document.getElementById("email_confirm").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+
+      if (email !== email_confirm) {
+        msg.textContent = "Email IDs do not match.";
+        return;
+      }
+
+      msg.style.color = "black";
+      msg.textContent = "Please wait...";
+
+      try {
+        const res = await fetch(`${SUPABASE_FUNC_URL}/lookup-student`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
+          body: JSON.stringify({ roll_number, email }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          msg.style.color = "red";
+          msg.textContent = data.error || "Something went wrong.";
+          return;
+        }
+
+        // Store session data
+        sessionStorage.setItem("roll_number", roll_number);
+        sessionStorage.setItem("email", email);
+        sessionStorage.setItem("mobile", mobile);
+        sessionStorage.setItem("student", JSON.stringify(data.student));
+
+        if (data.status === "new") {
+          // Send OTP then go to verify page
+          const otpRes = await fetch(`${SUPABASE_FUNC_URL}/send-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
+            body: JSON.stringify({ roll_number, email, purpose: "register" }),
+          });
+          const otpData = await otpRes.json();
+          if (!otpRes.ok) {
+            msg.style.color = "red";
+            msg.textContent = otpData.error || "Failed to send OTP.";
+            return;
+          }
+          sessionStorage.setItem("purpose", "register");
+          window.location.href = "verify.html";
+
+        } else if (data.status === "registered") {
+          // Already registered — go to status page
+          sessionStorage.setItem("contact", JSON.stringify(data.contact));
+          sessionStorage.setItem("choice", JSON.stringify(data.choice));
+          window.location.href = "status.html";
+        }
+
+      } catch (err) {
+        msg.style.color = "red";
+        msg.textContent = "Network error. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>
