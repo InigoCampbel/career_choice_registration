@@ -1,0 +1,496 @@
+/* ============================================================
+   SEED Training Portal — Shared Styles
+   PSG College of Arts & Science
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* ── Tokens ─────────────────────────────────────────────── */
+:root {
+  --blue-900:   #1e3a8a;
+  --blue-700:   #1d4ed8;
+  --blue-500:   #3b82f6;
+  --blue-200:   #bfdbfe;
+  --blue-50:    #eff6ff;
+
+  --slate-900:  #0f172a;
+  --slate-700:  #334155;
+  --slate-500:  #64748b;
+  --slate-300:  #cbd5e1;
+  --slate-100:  #f1f5f9;
+  --white:      #ffffff;
+
+  --success:    #16a34a;
+  --error:      #dc2626;
+  --warning:    #d97706;
+
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  22px;
+
+  --shadow-card: 0 4px 24px rgba(30, 58, 138, 0.08);
+  --shadow-btn:  0 4px 12px rgba(30, 58, 138, 0.25);
+
+  --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--blue-50);
+  color: var(--slate-900);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* ── Page wrapper ────────────────────────────────────────── */
+.page-wrapper {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 32px 28px;
+  border: 1px solid var(--blue-200);
+}
+
+/* ── Portal badge ────────────────────────────────────────── */
+.portal-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.portal-badge .badge-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--blue-900);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.portal-badge .badge-icon i {
+  color: var(--white);
+  font-size: 1rem;
+}
+
+.portal-badge .badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.portal-badge .badge-text span:first-child {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue-500);
+}
+
+.portal-badge .badge-text span:last-child {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--slate-700);
+}
+
+/* ── Page title ──────────────────────────────────────────── */
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--blue-900);
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.page-subtitle {
+  font-size: 0.82rem;
+  color: var(--slate-500);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* ── Divider ─────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--slate-100);
+  margin: 20px 0;
+}
+
+/* ── Form fields ─────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field:last-of-type {
+  margin-bottom: 0;
+}
+
+.field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--slate-700);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--slate-300);
+  border-radius: var(--radius-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.92rem;
+  color: var(--slate-900);
+  background: var(--white);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.field input::placeholder {
+  color: var(--slate-300);
+}
+
+/* select arrow */
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+/* ── OTP input ───────────────────────────────────────────── */
+.otp-input {
+  letter-spacing: 0.3em;
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+  text-align: center;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+  text-decoration: none;
+  line-height: 1;
+}
+
+.btn-primary {
+  background: var(--blue-900);
+  color: var(--white);
+  box-shadow: var(--shadow-btn);
+  width: 100%;
+  padding: 13px 20px;
+}
+
+.btn-primary:hover {
+  background: var(--blue-700);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(30, 58, 138, 0.32);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--blue-700);
+  border: 1.5px solid var(--blue-200);
+  width: 100%;
+  padding: 11px 20px;
+}
+
+.btn-secondary:hover {
+  background: var(--blue-50);
+  border-color: var(--blue-500);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--slate-500);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 6px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  color: var(--blue-700);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--error);
+  border: 1.5px solid #fecaca;
+  width: 100%;
+  padding: 11px 20px;
+}
+
+.btn-danger:hover {
+  background: #fff1f2;
+  border-color: var(--error);
+}
+
+/* ── Button group ────────────────────────────────────────── */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+/* ── Status messages ─────────────────────────────────────── */
+.msg {
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  display: none;
+  line-height: 1.5;
+}
+
+.msg.show { display: block; }
+
+.msg.error   { background: #fef2f2; color: var(--error);   border: 1px solid #fecaca; }
+.msg.success { background: #f0fdf4; color: var(--success);  border: 1px solid #bbf7d0; }
+.msg.info    { background: var(--blue-50); color: var(--blue-700); border: 1px solid var(--blue-200); }
+.msg.warning { background: #fffbeb; color: var(--warning);  border: 1px solid #fde68a; }
+
+/* ── Info rows (status page) ─────────────────────────────── */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--slate-100);
+  font-size: 0.88rem;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .info-label {
+  font-weight: 600;
+  color: var(--slate-500);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.info-row .info-value {
+  color: var(--slate-900);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* ── Choice badge ────────────────────────────────────────── */
+.choice-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--blue-900);
+  color: var(--white);
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Edit counter pills ──────────────────────────────────── */
+.edit-pills {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.edit-pill {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--slate-300);
+}
+
+.edit-pill.used {
+  background: var(--blue-500);
+}
+
+/* ── OTP countdown ───────────────────────────────────────── */
+.otp-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--slate-500);
+}
+
+.countdown-timer {
+  font-weight: 600;
+  color: var(--blue-700);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Step indicator ──────────────────────────────────────── */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 24px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.step-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 2px solid var(--slate-300);
+  color: var(--slate-300);
+  transition: all var(--transition);
+}
+
+.step-dot.active {
+  background: var(--blue-900);
+  border-color: var(--blue-900);
+  color: var(--white);
+}
+
+.step-dot.done {
+  background: var(--blue-200);
+  border-color: var(--blue-200);
+  color: var(--blue-900);
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--slate-300);
+  margin: 0 4px;
+  transition: background var(--transition);
+}
+
+.step-line.done {
+  background: var(--blue-200);
+}
+
+/* ── Success illustration ────────────────────────────────── */
+.success-icon {
+  width: 64px;
+  height: 64px;
+  background: #f0fdf4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border: 2px solid #bbf7d0;
+}
+
+.success-icon i {
+  font-size: 1.6rem;
+  color: var(--success);
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.portal-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--slate-500);
+  line-height: 1.6;
+  padding: 4px 0 8px;
+}
+
+/* ── Loading spinner on button ───────────────────────────── */
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .card { padding: 24px 18px; }
+  .page-title { font-size: 1.2rem; }
+}
