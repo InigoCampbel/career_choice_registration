@@ -2,37 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Your Career Choice</title>
-  <link rel="stylesheet" href="status.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Career Choice — SEED Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="portal.css">
 </head>
 <body>
-  <div class="card">
-    <h2>Your Career Choice</h2>
 
-    <div class="info-grid">
-      <span class="info-label">Name</span>      <span class="info-value" id="disp_name"></span>
-      <span class="info-label">Department</span><span class="info-value" id="disp_dept"></span>
-      <span class="info-label">Email</span>     <span class="info-value" id="disp_email"></span>
-      <span class="info-label">Mobile</span>    <span class="info-value" id="disp_mobile"></span>
+  <div class="page-wrapper">
+
+    <!-- Portal badge -->
+    <div style="padding: 0 4px;">
+      <div class="portal-badge">
+        <div class="badge-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="badge-text">
+          <span>SEED Training Portal</span>
+          <span>PSG College of Arts &amp; Science</span>
+        </div>
+      </div>
     </div>
 
-    <div class="choice-block">
-      <span class="choice-label">Career Choice</span>
-      <span class="choice-value" id="disp_choice"></span>
+    <!-- Student details card -->
+    <div class="card">
+      <div class="page-title">Your Career Choice</div>
+      <div class="page-subtitle">Your registration is on record. Details are shown below.</div>
+
+      <div style="background: var(--blue-50); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 20px;">
+        <div class="info-row">
+          <span class="info-label">Name</span>
+          <span class="info-value" id="disp_name">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Department</span>
+          <span class="info-value" id="disp_dept">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value" id="disp_email">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Mobile</span>
+          <span class="info-value" id="disp_mobile">—</span>
+        </div>
+      </div>
+
+      <!-- Choice highlight -->
+      <div style="display:flex; align-items:center; justify-content:space-between; background: var(--blue-900); border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 20px;">
+        <div>
+          <div style="font-size:0.72rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color: var(--blue-200); margin-bottom:4px;">Registered Choice</div>
+          <div style="font-size:1.6rem; font-weight:700; color: var(--white);" id="disp_choice">—</div>
+        </div>
+        <div class="choice-badge" style="width:52px; height:52px; font-size:1.4rem;" id="disp_choice_badge">—</div>
+      </div>
+
+      <!-- Edit counter -->
+      <div style="margin-bottom: 20px;">
+        <div style="font-size:0.78rem; font-weight:600; color: var(--slate-500); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px;">Edit Usage</div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="edit-pills" id="editPills"></div>
+          <span id="editCountText" style="font-size:0.82rem; color: var(--slate-700); font-weight:500;"></span>
+        </div>
+      </div>
+
+      <div id="statusMsg" class="msg"></div>
+
+      <div class="btn-group" id="editBlock" style="display:none;">
+        <button class="btn btn-primary" onclick="startEdit()" id="editBtn">
+          <i class="fas fa-pen"></i> Edit Career Choice
+        </button>
+      </div>
+
+      <div id="noEditMsg" style="display:none; font-size:0.82rem; color: var(--slate-500); background: var(--slate-100); border-radius: var(--radius-sm); padding: 12px 14px; line-height:1.5;">
+        <i class="fas fa-lock"></i>&nbsp; You have used all available edits. No further changes are allowed.
+      </div>
+
+      <div class="divider"></div>
+
+      <a href="index.html" class="btn btn-secondary" style="text-align:center; display:flex;">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </a>
     </div>
 
-    <p id="editInfo" class="edit-info"></p>
-
-    <div id="editBlock" style="display:none;">
-      <button class="btn-primary" onclick="startEdit()">Edit Career Choice</button>
+    <div class="portal-footer">
+      For assistance, contact the Learning &amp; Development team
     </div>
 
-    <p id="msg"></p>
-
-    <div class="card-footer">
-      <a href="index.html">Back to Home</a>
-    </div>
-  </div>
+  </div><!-- /page-wrapper -->
 
   <script>
     const SUPABASE_FUNC_URL = "https://nzpfljvuxqxijrvcmfao.supabase.co/functions/v1";
@@ -41,40 +96,68 @@
     const MAX_EDITS = 3;
 
     const roll_number = sessionStorage.getItem("roll_number");
-    const email = sessionStorage.getItem("email");
-    const student = JSON.parse(sessionStorage.getItem("student") || "{}");
-    const contact = JSON.parse(sessionStorage.getItem("contact") || "{}");
-    const choice = JSON.parse(sessionStorage.getItem("choice") || "null");
+    const email       = sessionStorage.getItem("email");
+    const student     = JSON.parse(sessionStorage.getItem("student")  || "{}");
+    const contact     = JSON.parse(sessionStorage.getItem("contact")  || "{}");
+    const choice      = JSON.parse(sessionStorage.getItem("choice")   || "null");
 
     if (!roll_number || !email || !choice) {
       window.location.href = "index.html";
     }
 
-    document.getElementById("disp_name").textContent = student.name || "";
-    document.getElementById("disp_dept").textContent = student.department || "";
-    document.getElementById("disp_email").textContent = contact.email || "";
-    document.getElementById("disp_mobile").textContent = contact.mobile || "";
-    document.getElementById("disp_choice").textContent = choice?.career_choice || "";
+    // Fill info
+    document.getElementById("disp_name").textContent    = student.name       || "—";
+    document.getElementById("disp_dept").textContent    = student.department  || "—";
+    document.getElementById("disp_email").textContent   = contact.email      || email;
+    document.getElementById("disp_mobile").textContent  = contact.mobile     || "—";
+    document.getElementById("disp_choice").textContent  = choice?.career_choice || "—";
+    document.getElementById("disp_choice_badge").textContent = choice?.career_choice || "—";
 
-    const edits_used = choice ? choice.edit_number - 1 : 0;
+    // Edit pill display
+    const edits_used      = choice ? (choice.edit_number - 1) : 0;
     const edits_remaining = MAX_EDITS - edits_used;
+    const pillsEl         = document.getElementById("editPills");
+
+    for (let i = 0; i < MAX_EDITS; i++) {
+      const pill = document.createElement("div");
+      pill.className = "edit-pill" + (i < edits_used ? " used" : "");
+      pillsEl.appendChild(pill);
+    }
+
+    document.getElementById("editCountText").textContent =
+      edits_remaining > 0
+        ? `${edits_used} of ${MAX_EDITS} used — ${edits_remaining} remaining`
+        : `All ${MAX_EDITS} edits used`;
 
     if (edits_remaining > 0) {
-      document.getElementById("editInfo").textContent =
-        `You have used ${edits_used} of ${MAX_EDITS} edits. You have ${edits_remaining} edit(s) remaining.`;
-      document.getElementById("editBlock").style.display = "block";
+      document.getElementById("editBlock").style.display = "flex";
     } else {
-      document.getElementById("editInfo").textContent =
-        `You have used all ${MAX_EDITS} edits. No further changes are allowed.`;
+      document.getElementById("noEditMsg").style.display = "block";
+    }
+
+    // ── Start edit ───────────────────────────────────────────
+    function showMsg(id, type, text) {
+      const el = document.getElementById(id);
+      el.className = `msg ${type} show`;
+      el.innerHTML = text;
+    }
+
+    function setLoading(btnId, loading, defaultHTML) {
+      const btn = document.getElementById(btnId);
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span> Please wait…';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = defaultHTML;
+      }
     }
 
     async function startEdit() {
-      const msg = document.getElementById("msg");
-      msg.style.color = "black";
-      msg.textContent = "Sending OTP to your email...";
+      setLoading("editBtn", true, '<i class="fas fa-pen"></i> Edit Career Choice');
 
       try {
-        const res = await fetch(`${SUPABASE_FUNC_URL}/send-otp`, {
+        const res  = await fetch(`${SUPABASE_FUNC_URL}/send-otp`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
           body: JSON.stringify({ roll_number, email, purpose: "edit" }),
@@ -82,20 +165,22 @@
         const data = await res.json();
 
         if (!res.ok) {
-          msg.style.color = "red";
-          msg.textContent = data.error || "Failed to send OTP.";
+          showMsg("statusMsg", "error", `<i class="fas fa-circle-exclamation"></i>&nbsp; ${data.error || "Failed to send OTP."}`);
+          setLoading("editBtn", false, '<i class="fas fa-pen"></i> Edit Career Choice');
           return;
         }
 
         sessionStorage.setItem("purpose", "edit");
         sessionStorage.setItem("current_choice", choice.career_choice);
+        sessionStorage.setItem("cooldown_until", data.cooldown_until || "");
         window.location.href = "verify.html";
 
       } catch (err) {
-        msg.style.color = "red";
-        msg.textContent = "Network error. Try again.";
+        showMsg("statusMsg", "error", '<i class="fas fa-wifi"></i>&nbsp; Network error. Try again.');
+        setLoading("editBtn", false, '<i class="fas fa-pen"></i> Edit Career Choice');
       }
     }
   </script>
+
 </body>
 </html>
