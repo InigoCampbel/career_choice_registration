@@ -2,63 +2,166 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Career Choice Registration</title>
-  <link rel="stylesheet" href="index.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Choice Registration — SEED Portal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="portal.css">
 </head>
 <body>
-  <div class="card">
-    <div class="page-header">
-      <h1>Career Choice Registration</h1>
-      <p class="subtitle">Enter your details to continue.</p>
+
+  <div class="page-wrapper">
+
+    <!-- Portal badge -->
+    <div style="display:flex; align-items:center; gap:10px; padding: 0 4px;">
+      <div class="portal-badge">
+        <div class="badge-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="badge-text">
+          <span>SEED Training Portal</span>
+          <span>PSG College of Arts &amp; Science</span>
+        </div>
+      </div>
     </div>
 
-    <form id="loginForm">
+    <!-- Step 1: Roll Number + Email -->
+    <div class="card" id="step1">
+      <!-- Step indicator -->
+      <div class="step-indicator">
+        <div class="step">
+          <div class="step-dot active" id="dot1">1</div>
+          <div class="step-line" id="line1"></div>
+        </div>
+        <div class="step">
+          <div class="step-dot" id="dot2">2</div>
+          <div class="step-line" id="line2"></div>
+        </div>
+        <div class="step">
+          <div class="step-dot" id="dot3">3</div>
+        </div>
+      </div>
+
+      <div class="page-title">Career Choice Registration</div>
+      <div class="page-subtitle">Enter your roll number and college email ID to continue.</div>
+
       <div class="field">
         <label for="roll_number">Roll Number</label>
-        <input type="text" id="roll_number" required>
+        <input type="text" id="roll_number" placeholder="e.g. 23CS001" autocomplete="off" spellcheck="false">
       </div>
+
       <div class="field">
-        <label for="email">Email ID</label>
-        <input type="email" id="email" required>
+        <label for="email">College Email ID</label>
+        <input type="email" id="email" placeholder="you@psgcas.ac.in" autocomplete="off">
       </div>
+
       <div class="field">
         <label for="email_confirm">Re-enter Email ID</label>
-        <input type="email" id="email_confirm" required>
+        <input type="email" id="email_confirm" placeholder="Re-enter your email" autocomplete="off">
       </div>
+
+      <div id="step1Msg" class="msg"></div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="handleStep1()" id="step1Btn">
+          Continue <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Mobile (only for new students) -->
+    <div class="card" id="step2" style="display:none;">
+      <div class="step-indicator">
+        <div class="step">
+          <div class="step-dot done"><i class="fas fa-check" style="font-size:0.6rem;"></i></div>
+          <div class="step-line done"></div>
+        </div>
+        <div class="step">
+          <div class="step-dot active">2</div>
+          <div class="step-line" id="line2b"></div>
+        </div>
+        <div class="step">
+          <div class="step-dot" id="dot3b">3</div>
+        </div>
+      </div>
+
+      <div class="page-title">Mobile Number</div>
+      <div class="page-subtitle">We'll send a one-time password to your college email to verify your identity.</div>
+
       <div class="field">
         <label for="mobile">Mobile Number</label>
-        <input type="tel" id="mobile" required>
+        <input type="tel" id="mobile" placeholder="10-digit mobile number" maxlength="10" autocomplete="off">
       </div>
-      <button type="submit" class="btn-primary">Continue</button>
-    </form>
 
-    <p id="msg"></p>
-  </div>
+      <div id="step2Msg" class="msg"></div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="handleStep2()" id="step2Btn">
+          Send OTP <i class="fas fa-paper-plane"></i>
+        </button>
+        <button class="btn btn-secondary" onclick="goBack(1)">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+      </div>
+    </div>
+
+    <div class="portal-footer">
+      For assistance, contact the Learning &amp; Development team
+    </div>
+
+  </div><!-- /page-wrapper -->
 
   <script>
     const SUPABASE_FUNC_URL = "https://nzpfljvuxqxijrvcmfao.supabase.co/functions/v1";
     const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cGZsanZ1eHF4aWpydmNtZmFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyOTI5MjYsImV4cCI6MjA5OTg2ODkyNn0.MAVZSQNgGleXA-5NUONkiJuMtwHu5Oq8yPuc5s8eKDQ";
 
-    document.getElementById("loginForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const msg = document.getElementById("msg");
-      msg.textContent = "";
+    // ── Helpers ──────────────────────────────────────────────
+    function showMsg(id, type, text) {
+      const el = document.getElementById(id);
+      el.className = `msg ${type} show`;
+      el.innerHTML = text;
+    }
 
-      const roll_number = document.getElementById("roll_number").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const email_confirm = document.getElementById("email_confirm").value.trim();
-      const mobile = document.getElementById("mobile").value.trim();
+    function clearMsg(id) {
+      const el = document.getElementById(id);
+      el.className = "msg";
+      el.textContent = "";
+    }
 
+    function setLoading(btnId, loading, defaultHTML) {
+      const btn = document.getElementById(btnId);
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span> Please wait…';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = defaultHTML;
+      }
+    }
+
+    function goBack(step) {
+      if (step === 1) {
+        document.getElementById("step2").style.display = "none";
+        document.getElementById("step1").style.display = "block";
+      }
+    }
+
+    // ── Step 1: lookup student ───────────────────────────────
+    async function handleStep1() {
+      clearMsg("step1Msg");
+
+      const roll_number = document.getElementById("roll_number").value.trim().toUpperCase();
+      const email       = document.getElementById("email").value.trim().toLowerCase();
+      const email_confirm = document.getElementById("email_confirm").value.trim().toLowerCase();
+
+      if (!roll_number) { showMsg("step1Msg", "error", "Please enter your roll number."); return; }
+      if (!email)       { showMsg("step1Msg", "error", "Please enter your email ID."); return; }
       if (email !== email_confirm) {
-        msg.textContent = "Email IDs do not match.";
+        showMsg("step1Msg", "error", "Email IDs do not match. Please check and try again.");
         return;
       }
 
-      msg.style.color = "black";
-      msg.textContent = "Please wait...";
+      setLoading("step1Btn", true, 'Continue <i class="fas fa-arrow-right"></i>');
 
       try {
-        const res = await fetch(`${SUPABASE_FUNC_URL}/lookup-student`, {
+        const res  = await fetch(`${SUPABASE_FUNC_URL}/lookup-student`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
           body: JSON.stringify({ roll_number, email }),
@@ -66,45 +169,85 @@
         const data = await res.json();
 
         if (!res.ok) {
-          msg.style.color = "red";
-          msg.textContent = data.error || "Something went wrong.";
+          // data.error will contain "Roll number not found" or "Incorrect roll number or email ID"
+          showMsg("step1Msg", "error", `<i class="fas fa-circle-exclamation"></i>&nbsp; ${data.error || "Something went wrong."}`);
+          setLoading("step1Btn", false, 'Continue <i class="fas fa-arrow-right"></i>');
           return;
         }
 
-        // Store session data
+        // Persist core data
         sessionStorage.setItem("roll_number", roll_number);
         sessionStorage.setItem("email", email);
-        sessionStorage.setItem("mobile", mobile);
         sessionStorage.setItem("student", JSON.stringify(data.student));
 
-        if (data.status === "new") {
-          // Send OTP then go to verify page
-          const otpRes = await fetch(`${SUPABASE_FUNC_URL}/send-otp`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
-            body: JSON.stringify({ roll_number, email, purpose: "register" }),
-          });
-          const otpData = await otpRes.json();
-          if (!otpRes.ok) {
-            msg.style.color = "red";
-            msg.textContent = otpData.error || "Failed to send OTP.";
-            return;
-          }
-          sessionStorage.setItem("purpose", "register");
-          window.location.href = "verify.html";
-
-        } else if (data.status === "registered") {
-          // Already registered — go to status page
+        if (data.status === "registered") {
+          // Already has a choice → go to status page
           sessionStorage.setItem("contact", JSON.stringify(data.contact));
-          sessionStorage.setItem("choice", JSON.stringify(data.choice));
+          sessionStorage.setItem("choice",  JSON.stringify(data.choice));
           window.location.href = "status.html";
+
+        } else {
+          // New student (no email/choice saved yet) → collect mobile
+          document.getElementById("step1").style.display = "none";
+          document.getElementById("step2").style.display = "block";
+          setLoading("step1Btn", false, 'Continue <i class="fas fa-arrow-right"></i>');
         }
 
       } catch (err) {
-        msg.style.color = "red";
-        msg.textContent = "Network error. Please try again.";
+        showMsg("step1Msg", "error", '<i class="fas fa-wifi"></i>&nbsp; Network error. Please try again.');
+        setLoading("step1Btn", false, 'Continue <i class="fas fa-arrow-right"></i>');
       }
+    }
+
+    // ── Step 2: send OTP ─────────────────────────────────────
+    async function handleStep2() {
+      clearMsg("step2Msg");
+
+      const mobile = document.getElementById("mobile").value.trim();
+      if (!mobile || mobile.length !== 10 || !/^\d+$/.test(mobile)) {
+        showMsg("step2Msg", "error", "Please enter a valid 10-digit mobile number.");
+        return;
+      }
+
+      setLoading("step2Btn", true, 'Send OTP <i class="fas fa-paper-plane"></i>');
+
+      const roll_number = sessionStorage.getItem("roll_number");
+      const email       = sessionStorage.getItem("email");
+
+      try {
+        const res  = await fetch(`${SUPABASE_FUNC_URL}/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "apikey": ANON_KEY },
+          body: JSON.stringify({ roll_number, email, purpose: "register" }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          showMsg("step2Msg", "error", `<i class="fas fa-circle-exclamation"></i>&nbsp; ${data.error || "Failed to send OTP."}`);
+          setLoading("step2Btn", false, 'Send OTP <i class="fas fa-paper-plane"></i>');
+          return;
+        }
+
+        sessionStorage.setItem("mobile",  mobile);
+        sessionStorage.setItem("purpose", "register");
+        sessionStorage.setItem("cooldown_until", data.cooldown_until || "");
+        window.location.href = "verify.html";
+
+      } catch (err) {
+        showMsg("step2Msg", "error", '<i class="fas fa-wifi"></i>&nbsp; Network error. Please try again.');
+        setLoading("step2Btn", false, 'Send OTP <i class="fas fa-paper-plane"></i>');
+      }
+    }
+
+    // ── Allow Enter key to progress ──────────────────────────
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const s1 = document.getElementById("step1");
+      const s2 = document.getElementById("step2");
+      if (s1.style.display !== "none") handleStep1();
+      else if (s2.style.display !== "none") handleStep2();
     });
   </script>
+
 </body>
 </html>
